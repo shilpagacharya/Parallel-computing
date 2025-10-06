@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
+#include <math.h>
+
+// OpenMP program to count primes between 1 and n (serial and parallel)
+// ...existing code up to first main() end...
+int is_prime(int num) {
+    if (num < 2) return 0;
+    if (num == 2) return 1;
+    if (num % 2 == 0) return 0;
+    int limit = (int)sqrt(num);
+    for (int i = 3; i <= limit; i += 2) {
+        if (num % i == 0) return 0;
+    }
+    return 1;
+}
+
+int main() {
+    int n = 20; // You can change this value or take input from user
+    int serial_count = 0, parallel_count = 0;
+    double start, end;
+
+    // Serial version
+    start = omp_get_wtime();
+    for (int i = 1; i <= n; i++) {
+        if (is_prime(i)) serial_count++;
+    }
+    end = omp_get_wtime();
+    printf("Serial Count of primes = %d\n", serial_count);
+    printf("Execution time (serial): %.5f seconds\n", end - start);
+
+    // Parallel version
+    start = omp_get_wtime();
+    #pragma omp parallel for schedule(dynamic) reduction(+:parallel_count)
+    for (int i = 1; i <= n; i++) {
+        if (is_prime(i)) parallel_count++;
+    }
+    end = omp_get_wtime();
+    printf("Parallel Count of primes = %d\n", parallel_count);
+    printf("Execution time (parallel): %.5f seconds\n", end - start);
+
+    return 0;
+}
