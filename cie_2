@@ -1,0 +1,22 @@
+#include <stdio.h>
+#include <mpi.h>
+
+int main(int argc, char *argv[]) {
+    int rank, value;
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if (rank == 0) {
+        value = 5; // You can change this value or take input
+        MPI_Send(&value, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+    } else if (rank == 1) {
+        MPI_Recv(&value, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        printf("Process 1 received %d\n", value);
+        value *= 2;
+        printf("Process 1 multiplied value = %d\n", value);
+    }
+
+    MPI_Finalize();
+    return 0;
+}
